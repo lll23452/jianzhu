@@ -1,0 +1,23 @@
+Feature,SHAP Value
+meter_reading_rolling_mean_3,1.5530887231340542
+meter_reading_lag_2,0.3849138960104026
+meter_reading_lag_1,0.2618236087354474
+meter_reading_rolling_std_3,0.1340883423608452
+meter_reading_rolling_mean_6,0.08190813029589471
+month_cos,0.02368225103201048
+meter_reading_lag_3,0.02104552504038655
+meter_reading_lag_24,0.019611000808777562
+meter_reading_rolling_std_24,0.015648608637455357
+meter_reading_rolling_mean_24,0.011805920810390957
+building_id_encoded,0.009727910199255537
+meter_reading_rolling_mean_12,0.009046285071928615
+month,0.007906169262507139
+day_of_week,0.007554343257755477
+meter_reading_rolling_std_6,0.006919911552055059
+month_sin,0.006569810109717024
+hour,0.00602017754444632
+meter_reading_rolling_std_12,0.0056121160268746495
+hour_cos,0.0033851603217879885
+hour_sin,0.0033547309897113144
+weekend,0.0
+meter_encoded,0.0

@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.idea/
+plots/
+comparison_plots/
+comparison_results/
+Figure/
+output.xlsx
+shuju.xml

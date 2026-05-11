@@ -1,0 +1,21 @@
+{
+  "model_performance": {
+    "RMSE": 40037.39715336882,
+    "MAE": 13534.202718539287,
+    "sMAPE (%)": 13.605737648422132,
+    "R\u00b2": 0.9359878968690486
+  },
+  "carbon_emission_summary": {
+    "total_energy": 200972269.7860772,
+    "total_carbon": 100486134.8930386,
+    "avg_carbon_per_record": 79372.93435469083
+  },
+  "energy_saving_summary": {
+    "total_actual": 200972269.7860772,
+    "total_predicted": 194165152.0,
+    "total_excess": 6807122.357568445,
+    "total_saving": 11970711.499619594,
+    "percent_saving": 5.9563996129225645,
+    "co2_reduction": 5985355.749809797
+  }
+}
