@@ -68,7 +68,7 @@ with st.sidebar:
     mode = st.radio("选择模式", ["单点预测", "多建筑对比", "历史数据回放", "场景模拟器", "在线导入预测"])
 
 # ---- 顶部标题和KPI ----
-st.title("⚡ 城市公共建筑能耗预测与诊断平台")
+st.title("⚡ 公共建筑能耗预测与节能诊断平台")
 
 st.markdown("""
 <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
