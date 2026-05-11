@@ -65,7 +65,7 @@ with st.sidebar:
     st.markdown("## ⚡ 控制台")
     st.markdown('<span style="color:#00e676;font-family:JetBrains Mono,monospace;">● 模型已就绪</span>', unsafe_allow_html=True)
     st.markdown("---")
-    mode = st.radio("选择模式", ["单点预测", "多建筑对比", "历史数据回放", "场景模拟器", "📂 在线导入预测"])
+    mode = st.radio("选择模式", ["单点预测", "多建筑对比", "历史数据回放", "场景模拟器", "在线导入预测"])
 
 # ---- 顶部标题和KPI ----
 st.title("⚡ 城市公共建筑能耗预测与诊断平台")
@@ -251,7 +251,7 @@ with tab1:
             c3.metric("碳排放变化", f"{delta_total * 0.5:+,.0f} kg CO₂")
 
     # ---- 在线导入预测 ----
-    elif mode == "📂 在线导入预测":
+    elif mode == "在线导入预测":
         st.markdown("## 📂 在线导入预测")
 
         uploaded_file = st.file_uploader("上传 CSV 或 Excel 文件", type=["csv", "xlsx", "xls"],
