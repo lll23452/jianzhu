@@ -108,7 +108,7 @@ with tab1:
             month = st.slider("月份", 1, 12, 7)
         day_of_week = st.slider("星期 (0=周一)", 0, 6, 3)
 
-        with st.expander("📊 历史负荷参数（高级）"):
+        with st.expander("📊 历史负荷参数"):
             history = {}
             cols = st.columns(4)
             keys = list(DEFAULT_HISTORY_VALUES.keys())
