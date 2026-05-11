@@ -65,7 +65,7 @@ with st.sidebar:
     st.markdown("## ⚡ 控制台")
     st.markdown('<span style="color:#00e676;font-family:JetBrains Mono,monospace;">● 模型已就绪</span>', unsafe_allow_html=True)
     st.markdown("---")
-    mode = st.radio("选择模式", ["单点预测", "多建筑对比", "历史数据回放", "场景模拟器"])
+    mode = st.radio("选择模式", ["单点预测", "多建筑对比", "历史数据回放", "场景模拟器", "📂 在线导入预测"])
 
 # ---- 顶部标题和KPI ----
 st.title("⚡ 城市公共建筑能耗预测与诊断平台")
@@ -249,6 +249,156 @@ with tab1:
             c1.metric("基准日总能耗", f"{sum(base_preds):,.0f} kWh")
             c2.metric("场景日总能耗", f"{sum(scene_preds):,.0f} kWh", delta=f"{delta_total:+,.0f} kWh")
             c3.metric("碳排放变化", f"{delta_total * 0.5:+,.0f} kg CO₂")
+
+    # ---- 在线导入预测 ----
+    elif mode == "📂 在线导入预测":
+        st.markdown("## 📂 在线导入预测")
+
+        uploaded_file = st.file_uploader("上传 CSV 或 Excel 文件", type=["csv", "xlsx", "xls"],
+                                         help="需包含 building_id 列，可选 timestamp、meter_reading、meter")
+
+        if uploaded_file is not None:
+            # 读取文件
+            if uploaded_file.name.endswith('.csv'):
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
+
+            st.markdown(f"**已加载 {len(df):,} 条记录**")
+            st.dataframe(df.head(10), width='stretch', hide_index=True)
+
+            # 验证必要列
+            if 'building_id' not in df.columns:
+                st.error("文件缺少必要列: `building_id`")
+            else:
+                st.markdown("---")
+                st.markdown("### ⚙️ 预测配置")
+
+                # 检查已有的列
+                has_timestamp = 'timestamp' in df.columns
+                has_hour = 'hour' in df.columns
+                has_month = 'month' in df.columns
+                has_actual = 'meter_reading' in df.columns
+
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    st.info(f"检测到列: {', '.join(df.columns.tolist())}")
+
+                if st.button("🚀 开始批量预测", type="primary"):
+                    with st.spinner(f"正在处理 {len(df)} 条记录..."):
+                        # 准备数据
+                        pred_df = df.copy()
+
+                        # 解析时间
+                        if has_timestamp:
+                            pred_df['timestamp'] = pd.to_datetime(pred_df['timestamp'])
+                            pred_df['hour'] = pred_df['timestamp'].dt.hour
+                            pred_df['day_of_week'] = pred_df['timestamp'].dt.dayofweek
+                            pred_df['month'] = pred_df['timestamp'].dt.month
+                        elif not has_hour:
+                            pred_df['hour'] = 12
+                            pred_df['day_of_week'] = 3
+                            pred_df['month'] = 7
+
+                        # 填充必要列
+                        if 'meter' not in pred_df.columns:
+                            pred_df['meter'] = 0
+
+                        # 逐行构建参数并批量预测
+                        results = []
+                        for _, row in pred_df.iterrows():
+                            params = {
+                                'hour': int(row.get('hour', 0)),
+                                'month': int(row.get('month', 1)),
+                                'day_of_week': int(row.get('day_of_week', 0)),
+                                'building_id': str(row['building_id']),
+                                'meter': int(row.get('meter', 0)),
+                            }
+                            results.append(params)
+
+                        predictions = model.batch_predict(results)
+
+                    # 结果展示
+                    pred_df['predicted_kwh'] = predictions
+                    pred_df['carbon_kg'] = pred_df['predicted_kwh'] * 0.5
+
+                    st.success(f"✅ 预测完成！共 {len(predictions)} 条")
+
+                    # 汇总指标
+                    c1, c2, c3, c4 = st.columns(4)
+                    c1.metric("总预测能耗", f"{sum(predictions):,.0f} kWh")
+                    c2.metric("总碳排放", f"{sum(predictions) * 0.5:,.0f} kg CO₂")
+                    c3.metric("平均能耗", f"{np.mean(predictions):,.0f} kWh")
+                    c4.metric("峰值能耗", f"{np.max(predictions):,.0f} kWh")
+
+                    # 结果表格
+                    st.markdown("### 📊 预测结果")
+                    display_cols = [c for c in ['building_id', 'hour', 'month', 'predicted_kwh', 'carbon_kg'] if c in pred_df.columns]
+                    st.dataframe(pred_df[display_cols], width='stretch', hide_index=True)
+
+                    # 如果有真实值，计算评估指标
+                    if has_actual:
+                        st.markdown("### 📏 模型评估")
+                        actual = pred_df['meter_reading'].values
+                        pred = np.array(predictions)
+                        mae = np.mean(np.abs(actual - pred))
+                        rmse = np.sqrt(np.mean((actual - pred) ** 2))
+                        mask = actual > 0
+                        mape = np.mean(np.abs(actual[mask] - pred[mask]) / actual[mask]) * 100 if mask.any() else 0
+                        ec1, ec2, ec3 = st.columns(3)
+                        ec1.metric("MAE", f"{mae:,.2f} kWh")
+                        ec2.metric("RMSE", f"{rmse:,.2f} kWh")
+                        ec3.metric("MAPE", f"{mape:.2f}%")
+
+                    # 按建筑汇总
+                    st.markdown("### 🏢 按建筑汇总")
+                    bld_summary = pred_df.groupby('building_id').agg(
+                        记录数=('predicted_kwh', 'count'),
+                        总能耗_kWh=('predicted_kwh', 'sum'),
+                        平均能耗_kWh=('predicted_kwh', 'mean'),
+                        总碳排放_kg=('carbon_kg', 'sum')
+                    ).reset_index()
+                    bld_summary = bld_summary.sort_values('总能耗_kWh', ascending=False)
+                    st.dataframe(bld_summary, width='stretch', hide_index=True)
+
+                    # 建筑柱状图
+                    fig = px.bar(bld_summary.head(10), x='building_id', y='总能耗_kWh',
+                                 color='总能耗_kWh', color_continuous_scale=['#00e676', '#1b5e20'])
+                    fig.update_layout(title="各建筑预测能耗 Top 10", xaxis_title="建筑",
+                                      template='plotly_dark', paper_bgcolor='#0f1117',
+                                      plot_bgcolor='#0f1117', font=dict(color='#e0e0e0'), height=400)
+                    st.plotly_chart(fig, width='stretch')
+
+                    # 如果有 timestamp，画时序图
+                    if has_timestamp:
+                        st.markdown("### ⏱️ 时序趋势")
+                        ts_df = pred_df.set_index('timestamp').resample('1h')['predicted_kwh'].mean().reset_index()
+                        fig = go.Figure()
+                        fig.add_trace(go.Scatter(x=ts_df['timestamp'], y=ts_df['predicted_kwh'],
+                                                 mode='lines', line=dict(color='#00e676', width=1.5),
+                                                 name='预测能耗'))
+                        fig.update_layout(title="预测能耗时序", xaxis_title="时间", yaxis_title="能耗 (kWh)",
+                                          template='plotly_dark', height=350, paper_bgcolor='#0f1117',
+                                          plot_bgcolor='#0f1117', font=dict(color='#e0e0e0'))
+                        st.plotly_chart(fig, width='stretch')
+
+                    # 小时分布
+                    if 'hour' in pred_df.columns:
+                        st.markdown("### 🕐 小时能耗分布")
+                        hour_dist = pred_df.groupby('hour')['predicted_kwh'].mean().reset_index()
+                        fig = px.bar(hour_dist, x='hour', y='predicted_kwh',
+                                     color='predicted_kwh', color_continuous_scale=['#ff9100', '#ff5252'])
+                        fig.update_layout(title="各小时平均能耗", xaxis_title="小时", yaxis_title="平均能耗 (kWh)",
+                                          template='plotly_dark', paper_bgcolor='#0f1117',
+                                          plot_bgcolor='#0f1117', font=dict(color='#e0e0e0'), height=350)
+                        st.plotly_chart(fig, width='stretch')
+
+                    # 下载结果
+                    st.markdown("### 📥 导出结果")
+                    csv = pred_df.to_csv(index=False)
+                    b64 = base64.b64encode(csv.encode()).decode()
+                    href = f'<a href="data:file/csv;base64,{b64}" download="prediction_results.csv" style="color:#00e676;text-decoration:none;">⬇️ 下载完整预测结果 CSV</a>'
+                    st.markdown(href, unsafe_allow_html=True)
 
 # ====== Tab 2: 碳排放看板 ======
 with tab2:
