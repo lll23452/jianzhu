@@ -1,20 +1,24 @@
 {
+  "id": "com.energy.diagnosis",
   "name": "公共建筑能耗预测与节能诊断平台",
   "short_name": "能耗诊断",
-  "description": "基于XGBoost的公共建筑能耗预测、碳排放核算与节能潜力评估",
-  "start_url": "/",
+  "description": "基于XGBoost的公共建筑能耗预测、碳排放核算与节能潜力评估平台",
+  "start_url": "https://lll23452-jianzhu.streamlit.app",
   "display": "standalone",
   "background_color": "#0f1117",
   "theme_color": "#00e676",
   "orientation": "any",
+  "scope": "/",
+  "dir": "ltr",
+  "lang": "zh",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://lll23452-jianzhu.streamlit.app/app/static/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://lll23452-jianzhu.streamlit.app/app/static/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
