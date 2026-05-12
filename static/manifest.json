@@ -1,0 +1,22 @@
+{
+  "name": "公共建筑能耗预测与节能诊断平台",
+  "short_name": "能耗诊断",
+  "description": "基于XGBoost的公共建筑能耗预测、碳排放核算与节能潜力评估",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#00e676",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -24,11 +24,22 @@ from config import DEFAULT_HISTORY_VALUES, DATA_DIR
 
 st.set_page_config(page_title="建筑能耗预测与诊断平台", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
 
-# ---- CSS ----
+# ---- CSS + PWA ----
 st.markdown("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600&family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="/app/static/manifest.json">
+<meta name="theme-color" content="#00e676">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="能耗诊断">
+<link rel="apple-touch-icon" href="/app/static/icon-192.png">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/app/static/sw.js');
+}
+</script>
 <style>
 :root {
     --bg-root: #0f1117; --bg-surface: #1a1d27; --bg-elevated: #242836;
