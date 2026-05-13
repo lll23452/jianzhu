@@ -18,7 +18,9 @@ saving_analyzer = EnergySavingAnalyzer()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    buildings = inference.get_building_list()
+    import json
+    return render_template('index.html', buildings_json=json.dumps(buildings))
 
 
 @app.route('/api/health')

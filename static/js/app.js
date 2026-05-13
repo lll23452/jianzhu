@@ -73,14 +73,19 @@ function showKPI(show) { document.getElementById('kpiRow').classList.toggle('hid
 async function loadBuildingList() {
   try {
     const data = await api('/api/buildings');
-    window._buildings = data.buildings;
-    window._buildingsReady = true;
-  } catch(e) { window._buildings = ['NDRC Building']; window._buildingsReady = true; }
+    if (data.buildings && data.buildings.length > 0) {
+      window._buildings = data.buildings;
+    }
+  } catch(e) {}
+  if (!window._buildings || window._buildings.length === 0) {
+    window._buildings = ['NDRC Building', "People's Hall", 'Benxi Central Hospital'];
+  }
+  window._buildingsReady = true;
   if (currentMode === 'predict') renderPanel();
 }
 
 async function ensureBuildings() {
-  if (!window._buildingsReady) {
+  if (!window._buildings || window._buildings.length <= 1) {
     await loadBuildingList();
   }
 }
@@ -89,7 +94,7 @@ function fillBuildingSelect(id, multi=false) {
   const sel = document.getElementById(id);
   if (!sel) return;
   if (!window._buildings || window._buildings.length === 0) {
-    window._buildings = ['NDRC Building'];
+    window._buildings = ['NDRC Building', "People's Hall", 'Benxi Central Hospital'];
   }
   sel.innerHTML = '';
   window._buildings.forEach((b,i) => {
