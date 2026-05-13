@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公共建筑能耗预测与节能诊断平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Work+Sans:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="noise-overlay"></div>
+
+  <header class="top-bar">
+    <h1 class="logo">⚡ 能耗诊断</h1>
+    <nav class="tabs-nav" id="tabNav">
+      <button class="tab-btn active" data-tab="analysis">📈 预测分析</button>
+      <button class="tab-btn" data-tab="carbon">🌍 碳排放</button>
+      <button class="tab-btn" data-tab="saving">💡 节能评估</button>
+      <button class="tab-btn" data-tab="explain">🔍 模型解释</button>
+      <button class="tab-btn" data-tab="export">📋 报告</button>
+    </nav>
+    <button class="dash-btn" id="dashBtn" title="数据大屏">⛶</button>
+  </header>
+
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-modes" id="modeNav">
+        <button class="mode-btn active" data-mode="predict">单点预测</button>
+        <button class="mode-btn" data-mode="compare">多建筑对比</button>
+        <button class="mode-btn" data-mode="replay">历史回放</button>
+        <button class="mode-btn" data-mode="simulate">场景模拟</button>
+        <button class="mode-btn" data-mode="import">在线导入</button>
+      </div>
+    </aside>
+
+    <main class="content" id="mainContent">
+      <div class="kpi-row" id="kpiRow">
+        <div class="kpi-card"><span class="kpi-label">总用电量</span><span class="kpi-value" style="--glow:#00f5a0">20.10 万 kWh</span></div>
+        <div class="kpi-card"><span class="kpi-label">总碳排放</span><span class="kpi-value" style="--glow:#b388ff">10.05 万吨</span></div>
+        <div class="kpi-card"><span class="kpi-label">模型 R²</span><span class="kpi-value" style="--glow:#00f5a0">0.9360</span></div>
+        <div class="kpi-card"><span class="kpi-label">可节约</span><span class="kpi-value" style="--glow:#ff5370">5.96%</span></div>
+      </div>
+      <div class="panel" id="panelContent">
+        <p style="color:#8899b4;text-align:center;padding:3rem;">选择左侧模式开始分析</p>
+      </div>
+    </main>
+  </div>
+
+  <div class="overlay" id="dashOverlay" style="display:none">
+    <div class="dash-grid" id="dashGrid"></div>
+    <button class="dash-exit" id="dashExit">✕ 退出大屏</button>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bn-btn active" data-mode="predict">预测</button>
+    <button class="bn-btn" data-mode="compare">对比</button>
+    <button class="bn-btn" data-mode="replay">回放</button>
+    <button class="bn-btn" data-mode="simulate">模拟</button>
+    <button class="bn-btn" data-mode="import">导入</button>
+  </nav>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
