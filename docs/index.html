@@ -11,5 +11,10 @@
 <body style="background:#0f1117;color:#fff;font-family:sans-serif;text-align:center;padding-top:30vh;">
   <h1 style="color:#00e676;">⚡ 能耗诊断平台</h1>
   <a href="https://lll23452-jianzhu.streamlit.app" style="color:#00e676;font-size:1.2rem;">点击进入平台</a>
+<script>
+  if (typeof navigator.serviceWorker !== 'undefined') {
+    navigator.serviceWorker.register('sw.js')
+  }
+</script>
 </body>
 </html>
