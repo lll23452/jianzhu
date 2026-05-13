@@ -74,13 +74,23 @@ async function loadBuildingList() {
   try {
     const data = await api('/api/buildings');
     window._buildings = data.buildings;
-  } catch(e) { window._buildings = ['NDRC Building']; }
+    window._buildingsReady = true;
+  } catch(e) { window._buildings = ['NDRC Building']; window._buildingsReady = true; }
   if (currentMode === 'predict') renderPanel();
+}
+
+async function ensureBuildings() {
+  if (!window._buildingsReady) {
+    await loadBuildingList();
+  }
 }
 
 function fillBuildingSelect(id, multi=false) {
   const sel = document.getElementById(id);
-  if (!sel || !window._buildings) return;
+  if (!sel) return;
+  if (!window._buildings || window._buildings.length === 0) {
+    window._buildings = ['NDRC Building'];
+  }
   sel.innerHTML = '';
   window._buildings.forEach((b,i) => {
     const o = document.createElement('option'); o.value = b; o.textContent = b;
@@ -92,7 +102,7 @@ function fillBuildingSelect(id, multi=false) {
 // =============================================
 //  1. 单点预测
 // =============================================
-function renderPredict(p) {
+async function renderPredict(p) {
   showKPI(true);
   p.innerHTML = `
     <h2 style="font-family:var(--font-display);color:var(--glow-green);margin-bottom:1rem;">📈 单点预测</h2>
@@ -106,6 +116,7 @@ function renderPredict(p) {
     <div id="predResult" style="margin-top:1rem;"></div>
     <div id="predChart" class="chart-container"></div>
   `;
+  await ensureBuildings();
   fillBuildingSelect('predBuilding');
   document.getElementById('predBtn').addEventListener('click', doPredict);
 }
@@ -132,7 +143,7 @@ async function doPredict() {
 // =============================================
 //  2. 多建筑对比
 // =============================================
-function renderComparison(p) {
+async function renderComparison(p) {
   showKPI(true);
   p.innerHTML = `
     <h2 style="font-family:var(--font-display);color:var(--glow-green);margin-bottom:1rem;">📊 多建筑对比</h2>
@@ -140,6 +151,7 @@ function renderComparison(p) {
     <button class="btn btn-primary" id="cmpBtn" style="margin-top:0.75rem">📊 生成对比</button>
     <div id="cmpChart" class="chart-container" style="margin-top:1rem"></div>
   `;
+  await ensureBuildings();
   fillBuildingSelect('cmpBuildings', true);
   document.getElementById('cmpBtn').addEventListener('click', doComparison);
 }
@@ -200,7 +212,7 @@ async function doReplay() {
 // =============================================
 //  4. 场景模拟
 // =============================================
-function renderSimulator(p) {
+async function renderSimulator(p) {
   showKPI(true);
   p.innerHTML = `
     <h2 style="font-family:var(--font-display);color:var(--glow-green);margin-bottom:1rem;">🔬 场景模拟器</h2>
@@ -216,6 +228,7 @@ function renderSimulator(p) {
     <div id="simChart" class="chart-container" style="margin-top:1rem"></div>
     <div id="simMetrics" class="kpi-row"></div>
   `;
+  await ensureBuildings();
   fillBuildingSelect('simBuilding');
   document.getElementById('simPreset').addEventListener('change', e => { document.getElementById('simMult').value=e.target.value; document.getElementById('simMultLabel').textContent=parseFloat(e.target.value).toFixed(2); });
   document.getElementById('simMult').addEventListener('input', e => { document.getElementById('simMultLabel').textContent=parseFloat(e.target.value).toFixed(2); });
